@@ -8,7 +8,7 @@
 
 #import "PDTSimpleCalendarViewCell.h"
 
-const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
+const CGFloat PDTSimpleCalendarCircleSize = 24.0f;
 
 @interface PDTSimpleCalendarViewCell ()
 

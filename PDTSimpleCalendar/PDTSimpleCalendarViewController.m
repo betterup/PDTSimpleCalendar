@@ -26,10 +26,6 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 @property (nonatomic, strong) PDTSimpleCalendarViewWeekdayHeader *weekdayHeader;
 
-// First and last date of the months based on the public properties first & lastDate
-@property (nonatomic) NSDate *firstDateMonth;
-@property (nonatomic) NSDate *lastDateMonth;
-
 //Number of days per week
 @property (nonatomic, assign) NSUInteger daysPerWeek;
 
@@ -53,7 +49,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         // Custom initialization
         [self simpleCalendarCommonInit];
     }
-
+    
     return self;
 }
 
@@ -76,7 +72,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (self) {
         [self simpleCalendarCommonInit];
     }
-
+    
     return self;
 }
 
@@ -86,8 +82,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     self.backgroundColor = [UIColor whiteColor];
     self.overlayTextColor = [UIColor blackColor];
     self.daysPerWeek = 7;
-    self.weekdayHeaderEnabled = NO;
-    self.weekdayTextType = PDTSimpleCalendarViewWeekdayTextTypeShort;
+    self.weekdayHeaderEnabled = YES;
+    self.weekdayTextType = PDTSimpleCalendarViewWeekdayTextTypeVeryShort;
 }
 
 #pragma mark - View Lifecycle
@@ -95,7 +91,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
+    
     if (self.selectedDate) {
         [self.collectionViewLayout invalidateLayout];
     }
@@ -136,7 +132,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         components.day = 1;
         _firstDate = [self.calendar dateFromComponents:components];
     }
-
+    
     return _firstDate;
 }
 
@@ -148,13 +144,13 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (NSDate *)firstDateMonth
 {
     if (_firstDateMonth) { return _firstDateMonth; }
-
+    
     NSDateComponents *components = [self.calendar components:kCalendarUnitYMD
                                                     fromDate:self.firstDate];
     components.day = 1;
-
+    
     _firstDateMonth = [self.calendar dateFromComponents:components];
-
+    
     return _firstDateMonth;
 }
 
@@ -166,7 +162,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
         offsetComponents.day = -1;
         [self setLastDate:[self.calendar dateByAddingComponents:offsetComponents toDate:self.firstDateMonth options:0]];
     }
-
+    
     return _lastDate;
 }
 
@@ -178,14 +174,14 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (NSDate *)lastDateMonth
 {
     if (_lastDateMonth) { return _lastDateMonth; }
-
+    
     NSDateComponents *components = [self.calendar components:kCalendarUnitYMD
                                                     fromDate:self.lastDate];
     components.month++;
     components.day = 0;
-
+    
     _lastDateMonth = [self.calendar dateFromComponents:components];
-
+    
     return _lastDateMonth;
 }
 
@@ -195,26 +191,26 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (!newSelectedDate) {
         [[self cellForItemAtDate:_selectedDate] setSelected:NO];
         _selectedDate = newSelectedDate;
-
+        
         return;
     }
-
+    
     //Test if selectedDate between first & last date
     NSDate *startOfDay = [self clampDate:newSelectedDate toComponents:kCalendarUnitYMD];
     if (([startOfDay compare:self.firstDateMonth] == NSOrderedAscending) || ([startOfDay compare:self.lastDateMonth] == NSOrderedDescending)) {
         //the newSelectedDate is not between first & last date of the calendar, do nothing.
         return;
     }
-
-
+    
+    
     [[self cellForItemAtDate:_selectedDate] setSelected:NO];
     [[self cellForItemAtDate:startOfDay] setSelected:YES];
-
+    
     _selectedDate = startOfDay;
-
+    
     NSIndexPath *indexPath = [self indexPathForCellAtDate:_selectedDate];
-    [self.collectionView reloadItemsAtIndexPaths:@[ indexPath ]];
-
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    
     //Notify the delegate
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:didSelectDate:)]) {
         [self.delegate simpleCalendarViewController:self didSelectDate:self.selectedDate];
@@ -234,18 +230,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     @try {
         NSIndexPath *selectedDateIndexPath = [self indexPathForCellAtDate:date];
-
-        if (![[self.collectionView indexPathsForVisibleItems] containsObject:selectedDateIndexPath]) {
-            //First, tried to use [self.collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:selectedDateIndexPath]; but it causes the header to be redraw multiple times (X each time you use scrollToDate:)
-            //TODO: Investigate & eventually file a radar.
-
-            NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:0 inSection:selectedDateIndexPath.section];
-            UICollectionViewLayoutAttributes *sectionLayoutAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:sectionIndexPath];
-            CGPoint origin = sectionLayoutAttributes.frame.origin;
-            origin.x = 0;
-            origin.y -= (PDTSimpleCalendarFlowLayoutHeaderHeight + PDTSimpleCalendarFlowLayoutInsetTop + self.collectionView.contentInset.top);
-            [self.collectionView setContentOffset:origin animated:animated];
-        }
+        UICollectionViewLayoutAttributes *sectionLayoutAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:selectedDateIndexPath];
+        CGPoint origin = sectionLayoutAttributes.frame.origin;
+        origin.x = 0;
+        origin.y -= (PDTSimpleCalendarFlowLayoutInsetTop + self.collectionView.contentInset.top);
+        [self.collectionView setContentOffset:origin animated:animated];
     }
     @catch (NSException *exception) {
         //Exception occured (it should not according to the documentation, but in reality...) let's scroll to the IndexPath then
@@ -269,22 +258,22 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-
+    
     //Configure the Collection View
     [self.collectionView registerClass:[PDTSimpleCalendarViewCell class] forCellWithReuseIdentifier:PDTSimpleCalendarViewCellIdentifier];
     [self.collectionView registerClass:[PDTSimpleCalendarViewHeader class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:PDTSimpleCalendarViewHeaderIdentifier];
-
+    
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     [self.collectionView setBackgroundColor:self.backgroundColor];
-
+    
     //Configure the Overlay View
     [self.overlayView setBackgroundColor:[self.backgroundColor colorWithAlphaComponent:0.90]];
     [self.overlayView setFont:[UIFont boldSystemFontOfSize:PDTSimpleCalendarOverlaySize]];
     [self.overlayView setTextColor:self.overlayTextColor];
     [self.overlayView setAlpha:0.0];
     [self.overlayView setTextAlignment:NSTextAlignmentCenter];
-
+    
     [self.view addSubview:self.overlayView];
     [self.overlayView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
@@ -295,10 +284,10 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     [self.weekdayHeader setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     NSInteger weekdayHeaderHeight = self.weekdayHeaderEnabled ? PDTSimpleCalendarWeekdayHeaderHeight : 0;
-
+    
     NSDictionary *viewsDictionary = @{@"overlayView": self.overlayView, @"weekdayHeader": self.weekdayHeader};
     NSDictionary *metricsDictionary = @{@"overlayViewHeight": @(PDTSimpleCalendarFlowLayoutHeaderHeight), @"weekdayHeaderHeight": @(weekdayHeaderHeight)};
-
+    
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[overlayView]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDictionary]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[weekdayHeader]|" options:NSLayoutFormatAlignAllTop metrics:nil views:viewsDictionary]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[weekdayHeader(weekdayHeaderHeight)][overlayView(overlayViewHeight)]" options:0 metrics:metricsDictionary views:viewsDictionary]];
@@ -327,7 +316,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     NSDate *firstOfMonth = [self firstOfMonthForSection:section];
     NSCalendarUnit weekCalendarUnit = [self weekCalendarUnitDependingOniOSVersion];
     NSRange rangeOfWeeks = [self.calendar rangeOfUnit:weekCalendarUnit inUnit:NSCalendarUnitMonth forDate:firstOfMonth];
-
+    
     //We need the number of calendar weeks for the full months (it will maybe include previous month and next months cells)
     return (rangeOfWeeks.length * self.daysPerWeek);
 }
@@ -359,52 +348,52 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     PDTSimpleCalendarViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:PDTSimpleCalendarViewCellIdentifier
                                                                                      forIndexPath:indexPath];
-
+    
     cell.delegate = self;
     
     NSDate *firstOfMonth = [self firstOfMonthForSection:indexPath.section];
     NSDate *cellDate = [self dateForCellAtIndexPath:indexPath];
-
+    
     NSDateComponents *cellDateComponents = [self.calendar components:kCalendarUnitYMD fromDate:cellDate];
     NSDateComponents *firstOfMonthsComponents = [self.calendar components:kCalendarUnitYMD fromDate:firstOfMonth];
-
+    
     BOOL isToday = NO;
     BOOL isSelected = NO;
     BOOL isCustomDate = NO;
-
+    
     if (cellDateComponents.month == firstOfMonthsComponents.month) {
         isSelected = ([self isSelectedDate:cellDate] && (indexPath.section == [self sectionForDate:cellDate]));
         isToday = [self isTodayDate:cellDate];
         [cell setDate:cellDate calendar:self.calendar];
-
+        
         //Ask the delegate if this date should have specific colors.
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldUseCustomColorsForDate:)]) {
             isCustomDate = [self.delegate simpleCalendarViewController:self shouldUseCustomColorsForDate:cellDate];
         }
-
-
+        
+        
     } else {
         [cell setDate:nil calendar:nil];
     }
-
+    
     if (isToday) {
         [cell setIsToday:isToday];
     }
-
+    
     if (isSelected) {
         [cell setSelected:isSelected];
     }
-
+    
     //If the current Date is not enabled, or if the delegate explicitely specify custom colors
     if (![self isEnabledDate:cellDate] || isCustomDate) {
         [cell refreshCellColors];
     }
-
+    
     //We rasterize the cell for performances purposes.
     //The circle background is made using roundedCorner which is a super expensive operation, specially with a lot of items on the screen to display (like we do)
     cell.layer.shouldRasterize = YES;
     cell.layer.rasterizationScale = [UIScreen mainScreen].scale;
-
+    
     return cell;
 }
 
@@ -414,15 +403,15 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     NSDate *firstOfMonth = [self firstOfMonthForSection:indexPath.section];
     NSDate *cellDate = [self dateForCellAtIndexPath:indexPath];
-
+    
     //We don't want to select Dates that are "disabled"
     if (![self isEnabledDate:cellDate]) {
         return NO;
     }
-
+    
     NSDateComponents *cellDateComponents = [self.calendar components:NSCalendarUnitDay|NSCalendarUnitMonth fromDate:cellDate];
     NSDateComponents *firstOfMonthsComponents = [self.calendar components:NSCalendarUnitMonth fromDate:firstOfMonth];
-
+    
     return (cellDateComponents.month == firstOfMonthsComponents.month);
 }
 
@@ -436,15 +425,15 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     if (kind == UICollectionElementKindSectionHeader) {
         PDTSimpleCalendarViewHeader *headerView = [self.collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:PDTSimpleCalendarViewHeaderIdentifier forIndexPath:indexPath];
-
+        
         headerView.titleLabel.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:indexPath.section]].uppercaseString;
-
+        
         headerView.layer.shouldRasterize = YES;
         headerView.layer.rasterizationScale = [UIScreen mainScreen].scale;
-
+        
         return headerView;
     }
-
+    
     return nil;
 }
 
@@ -453,39 +442,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     CGFloat itemWidth = floorf(CGRectGetWidth(self.collectionView.bounds) / self.daysPerWeek);
-
-    return CGSizeMake(itemWidth, itemWidth);
-}
-
-#pragma mark - UIScrollViewDelegate
-
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
-{
-    //We only display the overlay view if there is a vertical velocity
-    if (fabs(velocity.y) > 0.0f) {
-        if (self.overlayView.alpha < 1.0) {
-            [UIView animateWithDuration:0.25 animations:^{
-                [self.overlayView setAlpha:1.0];
-            }];
-        }
-    }
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    NSTimeInterval delay = (decelerate) ? 1.5 : 0.0;
-    [self performSelector:@selector(hideOverlayView) withObject:nil afterDelay:delay];
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    //Update Content of the Overlay View
-    NSArray *indexPaths = [self.collectionView indexPathsForVisibleItems];
-    //indexPaths is not sorted
-    NSArray *sortedIndexPaths = [indexPaths sortedArrayUsingSelector:@selector(compare:)];
-    NSIndexPath *firstIndexPath = [sortedIndexPaths firstObject];
-
-    self.overlayView.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:firstIndexPath.section]];
+    return CGSizeMake(itemWidth, 30);
 }
 
 - (void)hideOverlayView
@@ -523,11 +480,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (([clampedDate compare:self.firstDate] == NSOrderedAscending) || ([clampedDate compare:self.lastDate] == NSOrderedDescending)) {
         return NO;
     }
-
+    
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:isEnabledDate:)]) {
         return [self.delegate simpleCalendarViewController:self isEnabledDate:date];
     }
-
+    
     return YES;
 }
 
@@ -535,7 +492,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     NSDate *refDate = [self clampDate:referenceDate toComponents:kCalendarUnitYMD];
     NSDate *clampedDate = [self clampDate:date toComponents:kCalendarUnitYMD];
-
+    
     return [refDate isEqualToDate:clampedDate];
 }
 
@@ -545,7 +502,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     NSDateComponents *offset = [NSDateComponents new];
     offset.month = section;
-
+    
     return [self.calendar dateByAddingComponents:offset toDate:self.firstDateMonth options:0];
 }
 
@@ -558,14 +515,14 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (NSDate *)dateForCellAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDate *firstOfMonth = [self firstOfMonthForSection:indexPath.section];
-
+    
     NSUInteger weekday = [[self.calendar components: NSCalendarUnitWeekday fromDate: firstOfMonth] weekday];
     NSInteger startOffset = weekday - self.calendar.firstWeekday;
     startOffset += startOffset >= 0 ? 0 : self.daysPerWeek;
-
+    
     NSDateComponents *dateComponents = [NSDateComponents new];
     dateComponents.day = indexPath.item - startOffset;
-
+    
     return [self.calendar dateByAddingComponents:dateComponents toDate:firstOfMonth options:0];
 }
 
@@ -578,15 +535,15 @@ static const NSInteger kFirstDay = 1;
     }
     NSInteger section = [self sectionForDate:date];
     NSDate *firstOfMonth = [self firstOfMonthForSection:section];
-
+    
     NSInteger weekday = [[self.calendar components: NSCalendarUnitWeekday fromDate: firstOfMonth] weekday];
     NSInteger startOffset = weekday - self.calendar.firstWeekday;
     startOffset += startOffset >= 0 ? 0 : self.daysPerWeek;
-
+    
     NSInteger day = [[self.calendar components:kCalendarUnitYMD fromDate:date] day];
-
+    
     NSInteger item = (day - kFirstDay + startOffset);
-
+    
     return [NSIndexPath indexPathForItem:item inSection:section];
 }
 
@@ -603,12 +560,12 @@ static const NSInteger kFirstDay = 1;
     if (![self isEnabledDate:date]) {
         return YES;
     }
-
+    
     //Otherwise we ask the delegate
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldUseCustomColorsForDate:)]) {
         return [self.delegate simpleCalendarViewController:self shouldUseCustomColorsForDate:date];
     }
-
+    
     return NO;
 }
 
@@ -617,11 +574,11 @@ static const NSInteger kFirstDay = 1;
     if (![self isEnabledDate:date]) {
         return cell.circleDefaultColor;
     }
-
+    
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:circleColorForDate:)]) {
         return [self.delegate simpleCalendarViewController:self circleColorForDate:date];
     }
-
+    
     return nil;
 }
 
@@ -630,11 +587,11 @@ static const NSInteger kFirstDay = 1;
     if (![self isEnabledDate:date]) {
         return cell.textDisabledColor;
     }
-
+    
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:textColorForDate:)]) {
         return [self.delegate simpleCalendarViewController:self textColorForDate:date];
     }
-
+    
     return nil;
 }
 

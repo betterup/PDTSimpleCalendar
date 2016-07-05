@@ -38,6 +38,10 @@
  */
 @property (nonatomic, strong) NSDate *lastDate;
 
+// First and last date of the months based on the public properties first & lastDate
+@property (nonatomic, strong) NSDate *firstDateMonth;
+@property (nonatomic, strong) NSDate *lastDateMonth;
+
 /**
  *  Selected date displayed by the calendar.
  *  Changing this value will not cause the calendar to scroll to this date.
