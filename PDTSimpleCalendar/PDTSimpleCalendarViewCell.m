@@ -5,6 +5,8 @@
 //  Created by Jerome Miglino on 10/7/13.
 //  Copyright (c) 2013 Producteev. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import "PDTSimpleCalendarViewCell.h"
 
@@ -73,6 +75,17 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         _date = nil;
         _isToday = NO;
         _dayLabel = [[UILabel alloc] init];
+
+        _circleDefaultColor = [UIColor whiteColor];
+        _circleTodayColor = [UIColor grayColor];
+        _circleSelectedColor = [UIColor redColor];
+
+        _textDefaultColor = [UIColor blackColor];
+        _textTodayColor = [UIColor whiteColor];
+        _textSelectedColor = [UIColor whiteColor];
+        _textDisabledColor = [UIColor lightGrayColor];
+        _textDefaultFont = [UIFont systemFontOfSize:17.0];
+
         [self.dayLabel setFont:[self textDefaultFont]];
         [self.dayLabel setTextAlignment:NSTextAlignmentCenter];
         [self.contentView addSubview:self.dayLabel];
@@ -166,115 +179,26 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     [self.dayLabel setTextColor:[self textDefaultColor]];
 }
 
-#pragma mark - Circle Color Customization Methods
+#pragma mark - UIAppearance Support
 
-- (UIColor *)circleDefaultColor
-{
-    if(_circleDefaultColor == nil) {
-        _circleDefaultColor = [[[self class] appearance] circleDefaultColor];
-    }
-
-    if(_circleDefaultColor != nil) {
-        return _circleDefaultColor;
-    }
-
-    return [UIColor whiteColor];
+- (void)setTextDefaultFont:(UIFont *)textDefaultFont {
+    _textDefaultFont = textDefaultFont;
+    self.dayLabel.font = textDefaultFont;
 }
 
-- (UIColor *)circleTodayColor
-{
-    if(_circleTodayColor == nil) {
-        _circleTodayColor = [[[self class] appearance] circleTodayColor];
-    }
-
-    if(_circleTodayColor != nil) {
-        return _circleTodayColor;
-    }
-
-    return [UIColor grayColor];
+- (void)setCircleDefaultColor:(UIColor *)circleDefaultColor {
+    _circleDefaultColor = circleDefaultColor;
+    [self setCircleColor:self.isToday selected:self.isSelected];
 }
 
-- (UIColor *)circleSelectedColor
-{
-    if(_circleSelectedColor == nil) {
-        _circleSelectedColor = [[[self class] appearance] circleSelectedColor];
-    }
-
-    if(_circleSelectedColor != nil) {
-        return _circleSelectedColor;
-    }
-
-    return [UIColor redColor];
+- (void)setCircleSelectedColor:(UIColor *)circleSelectedColor {
+    _circleSelectedColor = circleSelectedColor;
+    [self setCircleColor:self.isToday selected:self.isSelected];
 }
 
-#pragma mark - Text Label Customizations Color
-
-- (UIColor *)textDefaultColor
-{
-    if(_textDefaultColor == nil) {
-        _textDefaultColor = [[[self class] appearance] textDefaultColor];
-    }
-
-    if(_textDefaultColor != nil) {
-        return _textDefaultColor;
-    }
-
-    return [UIColor blackColor];
-}
-
-- (UIColor *)textTodayColor
-{
-    if(_textTodayColor == nil) {
-        _textTodayColor = [[[self class] appearance] textTodayColor];
-    }
-
-    if(_textTodayColor != nil) {
-        return _textTodayColor;
-    }
-
-    return [UIColor whiteColor];
-}
-
-- (UIColor *)textSelectedColor
-{
-    if(_textSelectedColor == nil) {
-        _textSelectedColor = [[[self class] appearance] textSelectedColor];
-    }
-
-    if(_textSelectedColor != nil) {
-        return _textSelectedColor;
-    }
-
-    return [UIColor whiteColor];
-}
-
-- (UIColor *)textDisabledColor
-{
-    if(_textDisabledColor == nil) {
-        _textDisabledColor = [[[self class] appearance] textDisabledColor];
-    }
-
-    if(_textDisabledColor != nil) {
-        return _textDisabledColor;
-    }
-
-    return [UIColor lightGrayColor];
-}
-
-#pragma mark - Text Label Customizations Font
-
-- (UIFont *)textDefaultFont
-{
-    if(_textDefaultFont == nil) {
-        _textDefaultFont = [[[self class] appearance] textDefaultFont];
-    }
-
-    if (_textDefaultFont != nil) {
-        return _textDefaultFont;
-    }
-
-    // default system font
-    return [UIFont systemFontOfSize:17.0];
+- (void)setCircleTodayColor:(UIColor *)circleTodayColor {
+    _circleTodayColor = circleTodayColor;
+    [self setCircleColor:self.isToday selected:self.isSelected];
 }
 
 @end

@@ -5,6 +5,8 @@
 //  Created by Jerome Miglino on 10/7/13.
 //  Copyright (c) 2013 Producteev. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>

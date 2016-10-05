@@ -5,28 +5,33 @@
 //  Created by Yuwen Yan on 3/8/15.
 //  Copyright (c) 2015 MorningCall. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import "PDTSimpleCalendarViewWeekdayHeader.h"
 
 const CGFloat PDTSimpleCalendarWeekdayHeaderSize = 12.0f;
 const CGFloat PDTSimpleCalendarWeekdayHeaderHeight = 20.0f;
 
-@implementation PDTSimpleCalendarViewWeekdayHeader
+@interface PDTSimpleCalendarViewWeekdayHeader ()
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
+@property (strong, nonatomic) NSArray<UILabel *> *dayLabels;
+
+@end
+
+@implementation PDTSimpleCalendarViewWeekdayHeader
 
 - (id)initWithCalendar:(NSCalendar *)calendar weekdayTextType:(PDTSimpleCalendarViewWeekdayTextType)textType
 {
     self = [super init];
     if (self)
     {
+        _textColor = [UIColor blackColor];
+        _textFont = [UIFont systemFontOfSize:PDTSimpleCalendarWeekdayHeaderSize];
+        _headerBackgroundColor = [UIColor whiteColor];
+
         self.backgroundColor = self.headerBackgroundColor;
+
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.calendar = calendar;
         NSArray *weekdaySymbols = nil;
@@ -82,6 +87,8 @@ const CGFloat PDTSimpleCalendarWeekdayHeaderHeight = 20.0f;
                 [self addConstraint:[NSLayoutConstraint constraintWithItem:weekdaySymbolLabel attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:firstWeekdaySymbolLabel attribute:NSLayoutAttributeWidth multiplier:1 constant:0]];
             }
         }
+
+        _dayLabels = [weekdaySymbolLabelDict allValues];
         
         NSString *layoutString = [NSString stringWithFormat:@"|[%@(>=0)]|", [weekdaySymbolLabelNameArr componentsJoinedByString:@"]["]];
         [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:layoutString options:NSLayoutFormatAlignAllCenterY metrics:nil views:weekdaySymbolLabelDict]];
@@ -91,43 +98,19 @@ const CGFloat PDTSimpleCalendarWeekdayHeaderHeight = 20.0f;
     return self;
 }
 
-- (UIColor *)textColor
-{
-    if(_textColor == nil) {
-        _textColor = [[[self class] appearance] textColor];
-    }
-    
-    if(_textColor != nil) {
-        return _textColor;
-    }
-    
-    return [UIColor blackColor];
+- (void)setTextColor:(UIColor *)textColor {
+    _textColor = textColor;
+    [self.dayLabels makeObjectsPerformSelector:@selector(setTextColor:) withObject:textColor];
 }
 
-- (UIFont *)textFont
-{
-    if(_textFont == nil) {
-        _textFont = [[[self class] appearance] textFont];
-    }
-    
-    if(_textFont != nil) {
-        return _textFont;
-    }
-    
-    return [UIFont systemFontOfSize:PDTSimpleCalendarWeekdayHeaderSize];
+- (void)setTextFont:(UIFont *)textFont {
+    _textFont = textFont;
+    [self.dayLabels makeObjectsPerformSelector:@selector(setFont:) withObject:textFont];
 }
 
-- (UIColor *)headerBackgroundColor
-{
-    if(_headerBackgroundColor == nil) {
-        _headerBackgroundColor = [[[self class] appearance] headerBackgroundColor];
-    }
-    
-    if(_headerBackgroundColor != nil) {
-        return _headerBackgroundColor;
-    }
-    
-    return [UIColor whiteColor];
+- (void)setHeaderBackgroundColor:(UIColor *)headerBackgroundColor {
+    _headerBackgroundColor = headerBackgroundColor;
+    self.backgroundColor = headerBackgroundColor;
 }
 
 @end

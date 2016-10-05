@@ -5,6 +5,8 @@
 //  Created by Yuwen Yan on 3/8/15.
 //  Copyright (c) 2015 MorningCall. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import <UIKit/UIKit.h>
 
