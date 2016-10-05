@@ -67,6 +67,13 @@
 @property (nonatomic, assign) BOOL weekdayHeaderEnabled;
 
 /**
+ *  Setting this to NO disables the month/year header label at the top of each month.
+ *  
+ *  Default value is YES;
+ */
+@property (nonatomic, assign) BOOL monthYearHeaderEnabled;
+
+/**
  *  Setting this to NO disables the month overlay that shows when scrolling the calendar.
  *
  *  Default value is YES.

@@ -88,6 +88,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     self.overlayTextColor = [UIColor blackColor];
     self.daysPerWeek = 7;
     self.weekdayHeaderEnabled = NO;
+    self.monthYearHeaderEnabled = YES;
     self.monthOverlayEnabled = YES;
     self.weekdayTextType = PDTSimpleCalendarViewWeekdayTextTypeShort;
 }
@@ -308,6 +309,14 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     [self.collectionView setContentInset:UIEdgeInsetsMake(weekdayHeaderHeight, 0, 0, 0)];
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+{
+    if (self.monthYearHeaderEnabled) {
+        return [(PDTSimpleCalendarViewFlowLayout *)collectionViewLayout headerReferenceSize];
+    }
+    return CGSizeZero;
+}
+
 #pragma mark - Rotation Handling
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -433,10 +442,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     self.selectedDate = [self dateForCellAtIndexPath:indexPath];
 }
 
-
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-    if (kind == UICollectionElementKindSectionHeader) {
+    if (kind == UICollectionElementKindSectionHeader && self.monthYearHeaderEnabled) {
         PDTSimpleCalendarViewHeader *headerView = [self.collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:PDTSimpleCalendarViewHeaderIdentifier forIndexPath:indexPath];
 
         headerView.titleLabel.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:indexPath.section]].uppercaseString;
