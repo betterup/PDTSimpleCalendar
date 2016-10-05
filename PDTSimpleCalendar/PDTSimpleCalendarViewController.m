@@ -658,4 +658,22 @@ static const NSInteger kFirstDay = 1;
     return nil;
 }
 
+- (BOOL)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell shouldUseCustomFontForDate:(NSDate *)date
+{
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldUseCustomFontForDate:)]) {
+        return [self.delegate simpleCalendarViewController:self shouldUseCustomFontForDate:date];
+    }
+
+    return NO;
+}
+
+- (UIFont *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell fontForDate:(NSDate *)date
+{
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:fontForDate:)]) {
+        return [self.delegate simpleCalendarViewController:self fontForDate:date];
+    }
+    
+    return nil;
+}
+
 @end

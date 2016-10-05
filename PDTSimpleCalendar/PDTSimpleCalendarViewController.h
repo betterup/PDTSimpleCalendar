@@ -170,4 +170,7 @@
  */
 - (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller textColorForDate:(NSDate *)date;
 
+- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldUseCustomFontForDate:(NSDate *)date;
+- (UIFont *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller fontForDate:(NSDate *)date;
+
 @end;

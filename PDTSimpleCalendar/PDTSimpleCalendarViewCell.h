@@ -49,6 +49,9 @@
  */
 - (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell circleColorForDate:(NSDate *)date;
 
+- (BOOL)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell shouldUseCustomFontForDate:(NSDate *)date;
+- (UIFont *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell fontForDate:(NSDate *)date;
+
 @end
 
 /**

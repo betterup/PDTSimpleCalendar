@@ -118,6 +118,14 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     }
     self.dayLabel.text = day;
     self.dayLabel.accessibilityLabel = accessibilityDay;
+
+    UIFont *labelFont = [self textDefaultFont];
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:shouldUseCustomFontForDate:)] && [self.delegate simpleCalendarViewCell:self shouldUseCustomFontForDate:self.date]) {
+        if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:fontForDate:)] && [self.delegate simpleCalendarViewCell:self fontForDate:self.date]) {
+            labelFont = [self.delegate simpleCalendarViewCell:self fontForDate:self.date];
+        }
+    }
+    [self.dayLabel setFont:labelFont];
 }
 
 - (void)setIsToday:(BOOL)isToday
@@ -131,7 +139,6 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     [super setSelected:selected];
     [self setCircleColor:self.isToday selected:selected];
 }
-
 
 - (void)setCircleColor:(BOOL)today selected:(BOOL)selected
 {
