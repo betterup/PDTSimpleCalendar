@@ -5,6 +5,8 @@
 //  Created by Jerome Miglino on 10/7/13.
 //  Copyright (c) 2013 Producteev. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import <UIKit/UIKit.h>
 
@@ -63,6 +65,13 @@
  *  Default value is NO.
  */
 @property (nonatomic, assign) BOOL weekdayHeaderEnabled;
+
+/**
+ *  Setting this to NO disables the month overlay that shows when scrolling the calendar.
+ *
+ *  Default value is YES.
+ */
+@property (nonatomic, assign) BOOL monthOverlayEnabled;
 
 /**
  *  Setting Text type of weekday

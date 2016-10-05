@@ -5,6 +5,8 @@
 //  Created by Jerome Miglino on 10/7/13.
 //  Copyright (c) 2013 Producteev. All rights reserved.
 //
+//  Modifications copyright (c) 2016 BetterUp
+//
 
 #import "PDTSimpleCalendarViewController.h"
 
@@ -80,13 +82,13 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     return self;
 }
 
-- (void)simpleCalendarCommonInit
-{
+- (void)simpleCalendarCommonInit{
     self.overlayView = [[UILabel alloc] init];
     self.backgroundColor = [UIColor whiteColor];
     self.overlayTextColor = [UIColor blackColor];
     self.daysPerWeek = 7;
     self.weekdayHeaderEnabled = NO;
+    self.monthOverlayEnabled = YES;
     self.weekdayTextType = PDTSimpleCalendarViewWeekdayTextTypeShort;
 }
 
@@ -461,7 +463,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
-    //We only display the overlay view if there is a vertical velocity
+    if (!self.monthOverlayEnabled) {
+        return;
+    }
+
+    // We only display the overlay view if there is a vertical velocity
     if (fabs(velocity.y) > 0.0f) {
         if (self.overlayView.alpha < 1.0) {
             [UIView animateWithDuration:0.25 animations:^{
@@ -473,6 +479,10 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    if (!self.monthOverlayEnabled) {
+        return;
+    }
+
     NSTimeInterval delay = (decelerate) ? 1.5 : 0.0;
     [self performSelector:@selector(hideOverlayView) withObject:nil afterDelay:delay];
 }
@@ -485,7 +495,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     NSArray *sortedIndexPaths = [indexPaths sortedArrayUsingSelector:@selector(compare:)];
     NSIndexPath *firstIndexPath = [sortedIndexPaths firstObject];
 
-    self.overlayView.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:firstIndexPath.section]];
+    if (self.monthOverlayEnabled) {
+        self.overlayView.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:firstIndexPath.section]];
+    }
 }
 
 - (void)hideOverlayView
