@@ -29,8 +29,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 @property (nonatomic, strong) PDTSimpleCalendarViewWeekdayHeader *weekdayHeader;
 
 // First and last date of the months based on the public properties first & lastDate
-@property (nonatomic) NSDate *firstDateMonth;
-@property (nonatomic) NSDate *lastDateMonth;
+@property (nonatomic, readonly) NSDate *firstDateMonth;
+@property (nonatomic, readonly) NSDate *lastDateMonth;
+
+// Most recent month that has been scrolled to
+@property (nonatomic, copy) NSDate *lastScrolledMonth;
 
 //Number of days per week
 @property (nonatomic, assign) NSUInteger daysPerWeek;
@@ -44,7 +47,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 @synthesize firstDate = _firstDate;
 @synthesize lastDate = _lastDate;
 @synthesize calendar = _calendar;
-
+@synthesize firstDateMonth = _firstDateMonth;
+@synthesize lastDateMonth = _lastDateMonth;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -487,8 +491,17 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     NSArray *sortedIndexPaths = [indexPaths sortedArrayUsingSelector:@selector(compare:)];
     NSIndexPath *firstIndexPath = [sortedIndexPaths firstObject];
 
+    NSDate *firstOfMonth = [self firstOfMonthForSection:firstIndexPath.section];
+
     if (self.monthOverlayEnabled) {
-        self.overlayView.text = [self.headerDateFormatter stringFromDate:[self firstOfMonthForSection:firstIndexPath.section]];
+        self.overlayView.text = [self.headerDateFormatter stringFromDate:firstOfMonth];
+    }
+
+    if (!self.lastScrolledMonth || ![firstOfMonth isEqual:self.lastScrolledMonth]) {
+        self.lastScrolledMonth = firstOfMonth;
+        if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:didScrollToMonth:)]) {
+            [self.delegate simpleCalendarViewController:self didScrollToMonth:firstOfMonth];
+        }
     }
 }
 

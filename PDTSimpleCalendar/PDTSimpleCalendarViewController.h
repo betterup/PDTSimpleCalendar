@@ -190,4 +190,6 @@
  */
 - (UIFont *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller fontForDate:(NSDate *)date;
 
+- (void)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller didScrollToMonth:(NSDate *)date;
+
 @end;
