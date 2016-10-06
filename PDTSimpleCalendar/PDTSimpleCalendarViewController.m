@@ -485,22 +485,24 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    //Update Content of the Overlay View
     NSArray *indexPaths = [self.collectionView indexPathsForVisibleItems];
     //indexPaths is not sorted
     NSArray *sortedIndexPaths = [indexPaths sortedArrayUsingSelector:@selector(compare:)];
-    NSIndexPath *firstIndexPath = [sortedIndexPaths firstObject];
 
-    NSDate *firstOfMonth = [self firstOfMonthForSection:firstIndexPath.section];
-
+    //Update Content of the Overlay View
     if (self.monthOverlayEnabled) {
+        NSIndexPath *firstIndexPath = [sortedIndexPaths firstObject];
+        NSDate *firstOfMonth = [self firstOfMonthForSection:firstIndexPath.section];
         self.overlayView.text = [self.headerDateFormatter stringFromDate:firstOfMonth];
     }
 
-    if (!self.lastScrolledMonth || ![firstOfMonth isEqual:self.lastScrolledMonth]) {
-        self.lastScrolledMonth = firstOfMonth;
+    NSIndexPath *lastIndexPath = [sortedIndexPaths lastObject];
+    NSDate *firstOfMonthForLastVisibleMonth = [self firstOfMonthForSection:lastIndexPath.section];
+
+    if (!self.lastScrolledMonth || ![firstOfMonthForLastVisibleMonth isEqual:self.lastScrolledMonth]) {
+        self.lastScrolledMonth = firstOfMonthForLastVisibleMonth;
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:didScrollToMonth:)]) {
-            [self.delegate simpleCalendarViewController:self didScrollToMonth:firstOfMonth];
+            [self.delegate simpleCalendarViewController:self didScrollToMonth:firstOfMonthForLastVisibleMonth];
         }
     }
 }
