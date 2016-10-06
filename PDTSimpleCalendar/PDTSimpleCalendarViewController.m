@@ -235,26 +235,11 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
 - (void)scrollToDate:(NSDate *)date animated:(BOOL)animated
 {
-    @try {
-        NSIndexPath *selectedDateIndexPath = [self indexPathForCellAtDate:date];
-
-        if (![[self.collectionView indexPathsForVisibleItems] containsObject:selectedDateIndexPath]) {
-            //First, tried to use [self.collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:selectedDateIndexPath]; but it causes the header to be redraw multiple times (X each time you use scrollToDate:)
-            //TODO: Investigate & eventually file a radar.
-
-            NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:0 inSection:selectedDateIndexPath.section];
-            UICollectionViewLayoutAttributes *sectionLayoutAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:sectionIndexPath];
-            CGPoint origin = sectionLayoutAttributes.frame.origin;
-            origin.x = 0;
-            origin.y -= (PDTSimpleCalendarFlowLayoutHeaderHeight + PDTSimpleCalendarFlowLayoutInsetTop + self.collectionView.contentInset.top);
-            [self.collectionView setContentOffset:origin animated:animated];
-        }
-    }
-    @catch (NSException *exception) {
-        //Exception occured (it should not according to the documentation, but in reality...) let's scroll to the IndexPath then
-        NSInteger section = [self sectionForDate:date];
-        NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-        [self.collectionView scrollToItemAtIndexPath:sectionIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+    NSIndexPath *selectedDateIndexPath = [self indexPathForCellAtDate:date];
+    if (![[self.collectionView indexPathsForVisibleItems] containsObject:selectedDateIndexPath]) {
+        [self.collectionView scrollToItemAtIndexPath:selectedDateIndexPath
+                                    atScrollPosition:UICollectionViewScrollPositionCenteredVertically
+                                            animated:YES];
     }
 }
 
