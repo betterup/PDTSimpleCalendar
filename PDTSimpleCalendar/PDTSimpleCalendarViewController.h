@@ -142,7 +142,7 @@
  */
 - (void)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller didSelectDate:(NSDate *)date;
 
-/** @name Color Customization */
+/** @name Color and Font Customization */
 
 /**
  *  Asks the delegate if the Calendar should use custom colors for the specified date.
@@ -170,7 +170,24 @@
  */
 - (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller textColorForDate:(NSDate *)date;
 
+/**
+ *  Asks the delegate if the Calendar should use a custom font for the specified date.
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return YES if the calendar must ask the delegate for the font to use, NO if it should use the default font.
+ */
 - (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldUseCustomFontForDate:(NSDate *)date;
+
+/**
+ *  Asks the delegate for the custom font for a given date.
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return The desired font, or nil to use default
+ */
 - (UIFont *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller fontForDate:(NSDate *)date;
 
 @end;
