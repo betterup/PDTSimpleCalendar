@@ -240,11 +240,9 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (void)scrollToDate:(NSDate *)date animated:(BOOL)animated
 {
     NSIndexPath *selectedDateIndexPath = [self indexPathForCellAtDate:date];
-    if (![[self.collectionView indexPathsForVisibleItems] containsObject:selectedDateIndexPath]) {
-        [self.collectionView scrollToItemAtIndexPath:selectedDateIndexPath
-                                    atScrollPosition:UICollectionViewScrollPositionCenteredVertically
-                                            animated:YES];
-    }
+    [self.collectionView scrollToItemAtIndexPath:selectedDateIndexPath
+                                atScrollPosition:UICollectionViewScrollPositionCenteredVertically
+                                        animated:YES];
 }
 
 - (void)setOverlayTextColor:(UIColor *)overlayTextColor
