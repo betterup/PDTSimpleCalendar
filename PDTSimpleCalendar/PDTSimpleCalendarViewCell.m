@@ -124,8 +124,8 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     if (date && [self.delegate respondsToSelector:@selector(simpleCalendarViewCell:shouldUseCustomFontForDate:)] && [self.delegate simpleCalendarViewCell:self shouldUseCustomFontForDate:self.date]) {
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:fontForDate:)] && [self.delegate simpleCalendarViewCell:self fontForDate:self.date]) {
             labelFont = [self.delegate simpleCalendarViewCell:self fontForDate:self.date];
+            self.fontHasBeenCustomized = YES;
         }
-        self.fontHasBeenCustomized = YES;
     }
     [self.dayLabel setFont:labelFont];
 }
