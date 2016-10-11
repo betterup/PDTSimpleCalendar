@@ -16,6 +16,7 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
 
 @property (nonatomic, strong) UILabel *dayLabel;
 @property (nonatomic, strong) NSDate *date;
+@property (nonatomic) BOOL fontHasBeenCustomized;
 
 @end
 
@@ -124,6 +125,7 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:fontForDate:)] && [self.delegate simpleCalendarViewCell:self fontForDate:self.date]) {
             labelFont = [self.delegate simpleCalendarViewCell:self fontForDate:self.date];
         }
+        self.fontHasBeenCustomized = YES;
     }
     [self.dayLabel setFont:labelFont];
 }
@@ -181,16 +183,24 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     [super prepareForReuse];
     _date = nil;
     _isToday = NO;
+    _fontHasBeenCustomized = NO;
     [self.dayLabel setText:@""];
     [self.dayLabel setBackgroundColor:[self circleDefaultColor]];
     [self.dayLabel setTextColor:[self textDefaultColor]];
+    [self.dayLabel setFont:[self textDefaultFont]];
 }
 
 #pragma mark - UIAppearance Support
 
 - (void)setTextDefaultFont:(UIFont *)textDefaultFont {
     _textDefaultFont = textDefaultFont;
-    self.dayLabel.font = textDefaultFont;
+    // UIAppearance automagically invokes this method when the cell is drawn in the window.
+    // Unfortunately, this happens at different instants on different devices. If the font
+    // has already been customized in the population method, we don't want to override it here,
+    // so the flag check is necessary.
+    if (!self.fontHasBeenCustomized) {
+        self.dayLabel.font = textDefaultFont;
+    }
 }
 
 - (void)setCircleDefaultColor:(UIColor *)circleDefaultColor {
