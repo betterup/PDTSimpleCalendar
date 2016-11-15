@@ -150,6 +150,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (void)setFirstDate:(NSDate *)firstDate
 {
     _firstDate = [self clampDate:firstDate toComponents:kCalendarUnitYMD];
+    _firstDateMonth = nil;
 }
 
 - (NSDate *)firstDateMonth
@@ -180,6 +181,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 - (void)setLastDate:(NSDate *)lastDate
 {
     _lastDate = [self clampDate:lastDate toComponents:kCalendarUnitYMD];
+    _lastDateMonth = nil;
 }
 
 - (NSDate *)lastDateMonth
